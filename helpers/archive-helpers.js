@@ -26,6 +26,8 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function() {
+  // exports.paths.archivedSite
+  //use http serve assets?
 };
 
 exports.isUrlInList = function() {
