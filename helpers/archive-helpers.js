@@ -26,6 +26,13 @@ exports.initialize = function(pathsObj) {
 // modularize your code. Keep it clean!
 
 exports.readListOfUrls = function() {
+  fs.readFile(path.join(__dirname, exports.paths.list), 'utf8', function(err, data) {
+    if (err) {
+      console.log('readList failed');
+    } else {
+      res.end(data);
+    }
+  });
   // exports.paths.archivedSite
   //use http serve assets?
 };
@@ -33,7 +40,13 @@ exports.readListOfUrls = function() {
 exports.isUrlInList = function() {
 };
 
-exports.addUrlToList = function() {
+exports.addUrlToList = function(req) {
+  var newEntry = req.url + 'n/';
+  fs.writeFile(path.join(__dirname, exports.archive.paths.list), newEntry, 'utf8', function(err) {
+    if (err) {
+      console.log('addUrlToList error');
+    }
+  });
 };
 
 exports.isUrlArchived = function() {
