@@ -30,7 +30,7 @@ exports.readListOfUrls = function(callback) {
   fs.readFile(exports.paths.list, 'utf8', function(err, data) {
     if (err) {
       console.log('readList failed');
-    } 
+    }
     callback(data.split('\n'));
   });
 };
@@ -45,7 +45,7 @@ exports.isUrlInList = function(target, callback) {
         callback(true);
       }
     });
-    callback(false);  
+    callback(false);
   });
 };
 

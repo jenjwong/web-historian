@@ -1,8 +1,9 @@
 var path = require('path');
 var fs = require('fs');
 var archive = require('../helpers/archive-helpers');
+//bluebird
 
-exports.defaultCorsHeaders = {
+defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
   'access-control-allow-headers': 'content-type, accept',
@@ -10,16 +11,35 @@ exports.defaultCorsHeaders = {
   'Content-Type': 'text/html'
 };
 
-exports.serveAssets = function(res, asset, callback) {
-  fs.readFile('__dirname + /public/index.html', 'utf8', callback);
-};
-
 exports.sendResponse = function(res, data, statusCode) {
+  console.log('called the send resoibse', data)
   statusCode = statusCode || 200;
   res.writeHead(statusCode, defaultCorsHeaders);
-  res.end(JSON.stringify(data));
+  res.end(data);
 };
 
+exports.collectData = function(req, callback) {
+  var allTheData = '';
+  req.on('data', function(chunk) {
+    allTheData += chunk.toString();
+  });
+  req.on('end', function() {
+    callback(allTheData);
+  });
+};
 
-
-// As you progress, keep thinking about what helper functions you can put here!
+exports.serveAssets = function(res, assetPath, callback) {
+  fs.readFile(archive.paths.siteAssets + assetPath, 'utf8', function(err, data) {
+    if (err) {
+      fs.readFile(archive.paths.archivedSites + assetPath, 'utf8', function(err, data) {
+        if (err) {
+          callback ? callback() : exports.sendResponse(res, 404);
+        } else {
+          exports.sendResponse(res, data);
+        }
+      });
+    } else {
+      exports.sendResponse(res, data);
+    }
+  });
+};
