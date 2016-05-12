@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var request = require('request');
 
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
@@ -25,32 +26,56 @@ exports.initialize = function(pathsObj) {
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
 
-exports.readListOfUrls = function() {
-  fs.readFile(path.join(__dirname, exports.paths.list), 'utf8', function(err, data) {
+exports.readListOfUrls = function(callback) {
+  fs.readFile(exports.paths.list, 'utf8', function(err, data) {
     if (err) {
       console.log('readList failed');
-    } else {
-      res.end(data);
-    }
+    } 
+    callback(data.split('\n'));
   });
-  // exports.paths.archivedSite
-  //use http serve assets?
 };
 
-exports.isUrlInList = function() {
+
+
+exports.isUrlInList = function(target, callback) {
+  exports.readListOfUrls(function(data) {
+    var found = false;
+    _.each(data, function(item) {
+      if (target === data) {
+        callback(true);
+      }
+    });
+    callback(false);  
+  });
 };
 
-exports.addUrlToList = function(req) {
-  var newEntry = req.url + 'n/';
-  fs.writeFile(path.join(__dirname, exports.archive.paths.list), newEntry, 'utf8', function(err) {
+exports.addUrlToList = function(input, callback) {
+  var newEntry = input + '\n';
+  fs.writeFile(exports.paths.list, newEntry, 'utf8', function(err) {
     if (err) {
       console.log('addUrlToList error');
+    } else {
+      callback();
     }
   });
 };
 
-exports.isUrlArchived = function() {
+
+
+exports.isUrlArchived = function(url, callback) {
+  if (exports.paths.archivedSites + url) {
+    callback(true);
+  } else {
+    callback(false);
+  }
 };
 
-exports.downloadUrls = function() {
+exports.downloadUrls = function(urls) {
+  _.each(urls, function(url) {
+    if (!url) {
+    } else {
+      console.log(url, 'THIS IS URLS');
+      request('http://' + url).pipe(fs.createWriteStream(exports.paths.archivedSites + '/' + url));
+    }
+  });
 };
